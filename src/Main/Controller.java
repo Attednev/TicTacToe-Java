@@ -49,13 +49,13 @@ public class Controller {
     }
 
     @FXML private void difficultyEasy() {
-        this.maxDepth = 2;
+        this.maxDepth = 3;
         this.difficultyRoot.setVisible(false);
         this.gameRoot.setVisible(true);
     }
 
     @FXML private void difficultyMedium() {
-        this.maxDepth = 4;
+        this.maxDepth = 5;
         this.difficultyRoot.setVisible(false);
         this.gameRoot.setVisible(true);
     }
@@ -116,21 +116,21 @@ public class Controller {
         GridPane boardCopy = new GridPane();
         for (int i = 0; i < 3; i++) boardCopy.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
         for (int i = 0; i < 9; i++) ((Field)boardCopy.getChildren().get(i)).setState(((Field)this.gameRoot.getChildren().get(i)).getState());
-        int pos = miniMax(boardCopy, false, -10, 10, true, 0, 0);
+        int pos = miniMax(boardCopy, false, -10, 10, true, 0);
         if (pos != -1 ) ((Field)this.gameRoot.getChildren().get(pos)).setState(-1);
     }
 
-    private int miniMax(GridPane boardCopy, boolean isMin, int alpha, int beta, boolean first, int depth, int backupScore) {
+    private int miniMax(GridPane boardCopy, boolean isMin, int alpha, int beta, boolean first, int depth) {
         if (this.checkEndGame(boardCopy)) return isMin ? 1 : -1;
         if (depth == this.maxDepth) {
-            return backupScore;
+            return 0;
         }
         int maxEval = isMin ? 10 : -10;
         int pos = -1;
         for (Node node : boardCopy.getChildren()) {
             if (((Field) node).getState() == 0) {
                 ((Field) node).setState(isMin ? 1 : -1);
-                int score = miniMax(boardCopy, !isMin, alpha, beta, false, depth + 1, maxEval);
+                int score = miniMax(boardCopy, !isMin, alpha, beta, false, depth + 1);
                 ((Field) node).setState(0);
                 if (isMin && score < maxEval || !isMin && score > maxEval) {
                     maxEval = score;
