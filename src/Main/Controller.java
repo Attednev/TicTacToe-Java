@@ -3,11 +3,9 @@ package Main;
 import TicTacToe.Field;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 public class Controller {
     @FXML private VBox endScreenRoot;
@@ -37,7 +35,7 @@ public class Controller {
     }
 
     @FXML private void rematch() {
-        this.xTurn = !this.xTurn;
+        if (!this.singlePlayer) this.xTurn = !this.xTurn;
         this.gameRoot.setVisible(true);
         this.endScreenRoot.setVisible(false);
     }
@@ -57,7 +55,7 @@ public class Controller {
         int state = field.getState();
         if (state == 0) {
             field.setState(this.xTurn ? 1 : -1);
-            if (this.checkEndGame()) {
+            if (this.checkEndGame(this.gameRoot)) {
                 this.endGame();
             } else if (this.singlePlayer) {
                 this.aiMove();
@@ -69,10 +67,41 @@ public class Controller {
 
     private void aiMove() {
         // Start MinMax
+        GridPane boardCopy = new GridPane();
+        for (int i = 0; i < 3; i++) boardCopy.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
+        for (int i = 0; i < 9; i++) ((Field)boardCopy.getChildren().get(i)).setState(((Field)this.gameRoot.getChildren().get(i)).getState());
+        int pos = miniMax(boardCopy, false, true);
+        System.out.println(pos);
+        ((Field)this.gameRoot.getChildren().get(pos)).setState(-1);
     }
 
-    private boolean checkEndGame() {
-        ObservableList<Node> nodes = this.gameRoot.getChildren();
+
+    private int miniMax(GridPane boardCopy, boolean isMin, boolean firstDepth) {
+        int fieldsLeft = 0;
+        for (int i = 0; i < 9; i++)
+            if (((Field)boardCopy.getChildren().get(i)).getState() == 0)
+                fieldsLeft++;
+        if (fieldsLeft == 0) {
+            return this.checkEndGame(boardCopy) ? (isMin ? -1 : 1) : 0;
+        } else {
+            int currentBestPos = 0;
+            int currentBestValue = isMin ? 10 : -10;
+            for (int i = 0; i <  9; i++) {
+                if (((Field)boardCopy.getChildren().get(i)).getState() == 0) {
+                    ((Field)boardCopy.getChildren().get(i)).setState(isMin ? 1 : -1);
+                    int newValue = miniMax(boardCopy, !isMin, false);
+                    if (isMin && newValue < currentBestValue || !isMin && newValue > currentBestValue) {
+                        currentBestValue = newValue;
+                        currentBestPos = i;
+                    }
+                }
+            }
+            return firstDepth ? currentBestPos : currentBestValue;
+        }
+    }
+
+    private boolean checkEndGame(GridPane board) {
+        ObservableList<Node> nodes = board.getChildren();
         return (((Field)nodes.get(0)).getState() == ((Field)nodes.get(1)).getState() && ((Field)nodes.get(0)).getState() == ((Field)nodes.get(2)).getState() && ((Field)nodes.get(0)).getState() != 0 ||
                 ((Field)nodes.get(3)).getState() == ((Field)nodes.get(4)).getState() && ((Field)nodes.get(3)).getState() == ((Field)nodes.get(5)).getState() && ((Field)nodes.get(3)).getState() != 0 ||
                 ((Field)nodes.get(6)).getState() == ((Field)nodes.get(7)).getState() && ((Field)nodes.get(6)).getState() == ((Field)nodes.get(8)).getState() && ((Field)nodes.get(6)).getState() != 0 ||
