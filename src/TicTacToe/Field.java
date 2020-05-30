@@ -37,9 +37,10 @@ public class Field extends StackPane {
     }
 
     private void update() {
-        Label l = new Label(this.state == 1 ? "X" : "O");
+        Label l = new Label(this.state == 1 ? "X" : (this.state == -1 ? "O" : ""));
         l.setTextFill(Color.ORANGE);
         l.setFont(Font.font("Comic Sans", 45));
+        this.getChildren().clear();
         this.getChildren().add(l);
     }
 
