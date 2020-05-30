@@ -72,7 +72,7 @@ public class Controller {
                 if (this.singlePlayer) {
                     this.aiMove();
                     if (this.checkEndGame(this.gameRoot)) {
-                        this.endGame(this.xTurn ? 1 : -1);
+                        this.endGame(-1);
                     }
                 } else {
                     this.xTurn = !this.xTurn;
@@ -82,7 +82,6 @@ public class Controller {
     }
 
     private void aiMove() {
-        // Start MinMax
         GridPane boardCopy = new GridPane();
         for (int i = 0; i < 3; i++) boardCopy.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
         for (int i = 0; i < 9; i++) ((Field)boardCopy.getChildren().get(i)).setState(((Field)this.gameRoot.getChildren().get(i)).getState());
@@ -91,24 +90,21 @@ public class Controller {
     }
 
     private int miniMax(GridPane boardCopy, boolean isMin, boolean firstDepth) {
-        int currentBestPos = -1;
-        int currentBestValue = isMin ? 10 : -10;
-        for (int i = 0; i <  9; i++) {
-            if (((Field)boardCopy.getChildren().get(i)).getState() == 0) {
-                ((Field)boardCopy.getChildren().get(i)).setState(isMin ? 1 : -1);
-                int newValue = miniMax(boardCopy, !isMin, false);
-                if (isMin && newValue < currentBestValue || !isMin && newValue > currentBestValue) {
-                    currentBestValue = newValue;
-                    currentBestPos = i;
+        if (this.checkEndGame(boardCopy)) return isMin ? 10 : -10;
+        int pos = -1;
+        int record = isMin ? 100 : -100;
+        for (Node node : boardCopy.getChildren()) {
+            if (((Field) node).getState() == 0) {
+                ((Field) node).setState(isMin ? 1 : -1);
+                int score = miniMax(boardCopy, !isMin, false);
+                ((Field) node).setState(0);
+                if (isMin && score < record || !isMin && score > record) {
+                    record = score;
+                    pos = boardCopy.getChildren().indexOf(node);
                 }
-                ((Field)boardCopy.getChildren().get(i)).setState(0);
             }
         }
-        if (currentBestPos == -1) {
-            return firstDepth ? -1 : this.checkEndGame(boardCopy) ? (isMin ? 10 : -10) : 0;
-        } else {
-            return firstDepth ? currentBestPos : currentBestValue;
-        }
+        return (pos == -1) ? 0 : (firstDepth ? pos : record);
     }
 
     private boolean checkEndGame(GridPane board) {
