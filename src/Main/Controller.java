@@ -5,10 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 public class Controller {
+    @FXML private VBox endScreenRoot;
+    @FXML private Label winLabel;
     @FXML private BorderPane root;
     @FXML private GridPane gameRoot;
     @FXML private VBox menuRoot;
@@ -18,6 +21,7 @@ public class Controller {
     @FXML private void initialize() {
         this.root.setStyle("-fx-background-color: rgb(48, 50, 48)");
         this.gameRoot.setVisible(false);
+        this.endScreenRoot.setVisible(false);
         this.gameRoot.setStyle("-fx-border-color: rgb(48, 50, 48)");
         for (int i = 0; i < 3; i++) this.gameRoot.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
     }
@@ -42,7 +46,6 @@ public class Controller {
         if (state == 0) {
             field.setState(this.xTurn ? 1 : -1);
             if (this.checkEndGame()) {
-                System.out.println((this.xTurn ? "X" : "O" )+ "won");
                 this.endGame();
             }
             if (this.singlePlayer) {
@@ -54,7 +57,7 @@ public class Controller {
     }
 
     private void aiMove() {
-
+        // Start MinMax
     }
 
     private boolean checkEndGame() {
@@ -71,8 +74,17 @@ public class Controller {
     }
 
     private void endGame() {
+        this.endScreenRoot.setVisible(true);
+        this.gameRoot.setVisible(false);
+        this.winLabel.setText((this.xTurn ? "X" : "O" ) + " won!");
+    }
+
+    @FXML private void rematch() {
 
     }
 
+    @FXML private void backToMenu() {
+
+    }
 
 }
