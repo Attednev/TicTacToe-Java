@@ -36,6 +36,17 @@ public class Controller {
         this.changeSceneToGame();
     }
 
+    @FXML private void rematch() {
+        this.xTurn = !this.xTurn;
+        this.gameRoot.setVisible(true);
+        this.endScreenRoot.setVisible(false);
+    }
+
+    @FXML private void backToMenu() {
+        this.menuRoot.setVisible(true);
+        this.endScreenRoot.setVisible(false);
+    }
+
     private void changeSceneToGame() {
         this.gameRoot.setVisible(true);
         this.menuRoot.setVisible(false);
@@ -48,10 +59,7 @@ public class Controller {
             field.setState(this.xTurn ? 1 : -1);
             if (this.checkEndGame()) {
                 this.endGame();
-                return;
-            }
-            if (this.singlePlayer) {
-                System.out.println("AI move");
+            } else if (this.singlePlayer) {
                 this.aiMove();
             } else {
                 this.xTurn = !this.xTurn;
@@ -81,17 +89,6 @@ public class Controller {
         this.endScreenRoot.setVisible(true);
         this.gameRoot.setVisible(false);
         this.winLabel.setText((this.xTurn ? "X" : "O" ) + " won!");
-    }
-
-    @FXML private void rematch() {
-        this.xTurn = !this.xTurn;
-        this.gameRoot.setVisible(true);
-        this.endScreenRoot.setVisible(false);
-    }
-
-    @FXML private void backToMenu() {
-        this.menuRoot.setVisible(true);
-        this.endScreenRoot.setVisible(false);
     }
 
 }
