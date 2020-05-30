@@ -56,11 +56,27 @@ public class Controller {
         if (state == 0) {
             field.setState(this.xTurn ? 1 : -1);
             if (this.checkEndGame(this.gameRoot)) {
-                this.endGame();
-            } else if (this.singlePlayer) {
-                this.aiMove();
+                this.endGame(this.xTurn ? 1 : -1);
             } else {
-                this.xTurn = !this.xTurn;
+                boolean draw = true;
+                for (int i = 0; i < 9; i++) {
+                    if (((Field)this.gameRoot.getChildren().get(i)).getState() == 0) {
+                        draw = false;
+                        break;
+                    }
+                }
+                if (draw) {
+                    this.endGame(0);
+                    return;
+                }
+                if (this.singlePlayer) {
+                    this.aiMove();
+                    if (this.checkEndGame(this.gameRoot)) {
+                        this.endGame(this.xTurn ? 1 : -1);
+                    }
+                } else {
+                    this.xTurn = !this.xTurn;
+                }
             }
         }
     }
@@ -71,31 +87,26 @@ public class Controller {
         for (int i = 0; i < 3; i++) boardCopy.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
         for (int i = 0; i < 9; i++) ((Field)boardCopy.getChildren().get(i)).setState(((Field)this.gameRoot.getChildren().get(i)).getState());
         int pos = miniMax(boardCopy, false, true);
-        System.out.println(pos);
-        ((Field)this.gameRoot.getChildren().get(pos)).setState(-1);
+        if (pos != -1 ) ((Field)this.gameRoot.getChildren().get(pos)).setState(-1);
     }
 
-
     private int miniMax(GridPane boardCopy, boolean isMin, boolean firstDepth) {
-        int fieldsLeft = 0;
-        for (int i = 0; i < 9; i++)
-            if (((Field)boardCopy.getChildren().get(i)).getState() == 0)
-                fieldsLeft++;
-        if (fieldsLeft == 0) {
-            return this.checkEndGame(boardCopy) ? (isMin ? -1 : 1) : 0;
-        } else {
-            int currentBestPos = 0;
-            int currentBestValue = isMin ? 10 : -10;
-            for (int i = 0; i <  9; i++) {
-                if (((Field)boardCopy.getChildren().get(i)).getState() == 0) {
-                    ((Field)boardCopy.getChildren().get(i)).setState(isMin ? 1 : -1);
-                    int newValue = miniMax(boardCopy, !isMin, false);
-                    if (isMin && newValue < currentBestValue || !isMin && newValue > currentBestValue) {
-                        currentBestValue = newValue;
-                        currentBestPos = i;
-                    }
+        int currentBestPos = -1;
+        int currentBestValue = isMin ? 10 : -10;
+        for (int i = 0; i <  9; i++) {
+            if (((Field)boardCopy.getChildren().get(i)).getState() == 0) {
+                ((Field)boardCopy.getChildren().get(i)).setState(isMin ? 1 : -1);
+                int newValue = miniMax(boardCopy, !isMin, false);
+                if (isMin && newValue < currentBestValue || !isMin && newValue > currentBestValue) {
+                    currentBestValue = newValue;
+                    currentBestPos = i;
                 }
+                ((Field)boardCopy.getChildren().get(i)).setState(0);
             }
+        }
+        if (currentBestPos == -1) {
+            return firstDepth ? -1 : this.checkEndGame(boardCopy) ? (isMin ? 10 : -10) : 0;
+        } else {
             return firstDepth ? currentBestPos : currentBestValue;
         }
     }
@@ -113,11 +124,11 @@ public class Controller {
                 ((Field)nodes.get(2)).getState() == ((Field)nodes.get(4)).getState() && ((Field)nodes.get(2)).getState() == ((Field)nodes.get(6)).getState() && ((Field)nodes.get(2)).getState() != 0);
     }
 
-    private void endGame() {
+    private void endGame(int turn) {
         for (int i = 0; i < 9; i++) ((Field)this.gameRoot.getChildren().get(i)).setState(0);
         this.endScreenRoot.setVisible(true);
         this.gameRoot.setVisible(false);
-        this.winLabel.setText((this.xTurn ? "X" : "O" ) + " won!");
+        this.winLabel.setText(turn == 0 ? "Draw!" : ((turn == 1? "X" : "O" ) + " won!"));
     }
 
 }
