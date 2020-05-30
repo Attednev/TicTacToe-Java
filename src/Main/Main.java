@@ -11,8 +11,8 @@ import java.io.IOException;
 public class Main extends Application {
 
     @Override public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("scene.fxml"));
-        primaryStage.setTitle("Client");
+        Parent root = FXMLLoader.load(getClass().getResource("Menu.fxml"));
+        primaryStage.setTitle("Window");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.show();
