@@ -47,6 +47,32 @@
                     </font>
                 </Button>
             </VBox>
+            <VBox fx:id="difficultyRoot" alignment="CENTER" spacing="25">
+                <Button maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#difficultyEasy"
+                        text="Easy">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                </Button>
+                <Button maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#difficultyMedium"
+                        text="Medium">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                </Button>
+                <Button maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#difficultyHard"
+                        text="Hard">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                </Button>
+                <Button maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#difficultyImpossible"
+                        text="Impossible">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                </Button>
+            </VBox>
         </StackPane>
     </center>
 </BorderPane>
