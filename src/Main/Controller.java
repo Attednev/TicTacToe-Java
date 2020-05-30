@@ -85,26 +85,29 @@ public class Controller {
         GridPane boardCopy = new GridPane();
         for (int i = 0; i < 3; i++) boardCopy.addColumn(i, new Field(i * 3 + 1, this), new Field(i * 3 + 2, this), new Field(i * 3 + 3, this));
         for (int i = 0; i < 9; i++) ((Field)boardCopy.getChildren().get(i)).setState(((Field)this.gameRoot.getChildren().get(i)).getState());
-        int pos = miniMax(boardCopy, false, true);
+        int pos = miniMax(boardCopy, false, -10, 10, true);
         if (pos != -1 ) ((Field)this.gameRoot.getChildren().get(pos)).setState(-1);
     }
 
-    private int miniMax(GridPane boardCopy, boolean isMin, boolean firstDepth) {
-        if (this.checkEndGame(boardCopy)) return isMin ? 10 : -10;
+    private int miniMax(GridPane boardCopy, boolean isMin, int alpha, int beta, boolean first) {
+        if (this.checkEndGame(boardCopy)) return isMin ? 1 : -1;
+        int maxEval = isMin ? 10 : -10;
         int pos = -1;
-        int record = isMin ? 100 : -100;
         for (Node node : boardCopy.getChildren()) {
             if (((Field) node).getState() == 0) {
                 ((Field) node).setState(isMin ? 1 : -1);
-                int score = miniMax(boardCopy, !isMin, false);
+                int score = miniMax(boardCopy, !isMin, alpha, beta, false);
                 ((Field) node).setState(0);
-                if (isMin && score < record || !isMin && score > record) {
-                    record = score;
+                if (isMin && score < maxEval || !isMin && score > maxEval) {
+                    maxEval = score;
                     pos = boardCopy.getChildren().indexOf(node);
                 }
+                alpha = isMin ? alpha : Math.max(alpha, score);
+                beta = isMin ? Math.max(beta, score) : beta;
+                if (beta <= alpha) break;
             }
         }
-        return (pos == -1) ? 0 : (firstDepth ? pos : record);
+        return pos == -1 ? 0 : (first ? pos : maxEval);
     }
 
     private boolean checkEndGame(GridPane board) {
